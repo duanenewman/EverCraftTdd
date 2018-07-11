@@ -6,7 +6,10 @@ using System.Threading.Tasks;
 
 namespace EverCraftTdd
 {
-    public class Class1
-    {
-    }
+	public enum CharacterAlignment
+	{
+		Good,
+		Evil,
+		Neutral
+	}
 }
