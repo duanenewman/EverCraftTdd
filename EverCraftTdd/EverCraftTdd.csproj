@@ -43,6 +43,7 @@
     <Compile Include="Character.cs" />
     <Compile Include="CharacterAlignment.cs" />
     <Compile Include="CharacterClass.cs" />
+    <Compile Include="CharacterRace.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -7,7 +7,7 @@ namespace EverCraftTdd
 		public string Name { get; set; }
 		public int BaseHitPoints { get; set; } = 5;
 		public Func<int, int> GetLevelModifier = (lvl) => lvl / 2;
-		public Func<Character, int> GetAttackAttribute = c => c.Strength;
+		public Func<Character, int> GetAttackModifier = c => c.GetStrengthModifier();
 		public Func<Character, int> GetCritMultiplier = o => 2;
 		public bool IgnoresDexterityArmorClassModifier = false;
 		public Func<CharacterAlignment, CharacterAlignment> ValidateAlignment = a => a;
@@ -33,7 +33,7 @@ namespace EverCraftTdd
 			Name = "Rogue",
 			GetCritMultiplier = o => 3,
 			IgnoresDexterityArmorClassModifier = true,
-			GetAttackAttribute = c => c.Dexterity,
+			GetAttackModifier = c => c.GetDexterityModifier(),
 			ValidateAlignment = a => a != CharacterAlignment.Good ? a : CharacterAlignment.Neutral,
 		};
 
@@ -42,7 +42,7 @@ namespace EverCraftTdd
 			Name = "Monk",
 			BaseHitPoints = 6,
 			BaseAttackDamage = 3,
-			GetArmorClassBonusModifier = c => Math.Max(Character.GetModifier(c.Wisdom), 0),
+			GetArmorClassBonusModifier = c => Math.Max(c.GetWisdomModifier(), 0),
 			GetLevelModifier = (lvl) => lvl * 2 / 3,
 		};
 

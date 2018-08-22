@@ -770,5 +770,203 @@ namespace EverCraftTdd.Tests
 
 			return character.Alignment;
 		}
+
+		[Test]
+		public void CharacterDefaultsToHumanRace()
+		{
+			var character = new Character();
+			Assert.AreEqual(CharacterRace.Human.Name, character.Race.Name);
+		}
+
+		[Test]
+		public void OrcRaceHasPlus2StrengthModifier()
+		{
+			var character = new Character
+			{
+				Race = CharacterRace.Orc,
+			};
+			var opponent = new Character
+			{
+			};
+			var didHit = character.Attack(opponent, 8);
+			Assert.IsTrue(didHit);
+		}
+
+		[Test]
+		public void OrcRaceHasNegative1IntelligenceModifier()
+		{
+			var character = new Character
+			{
+				Race = CharacterRace.Orc,
+			};
+			var intelligenceModifier = character.GetIntelligenceModifier();
+			Assert.AreEqual(-1, intelligenceModifier);
+		}
+
+		[Test]
+		public void OrcRaceHasNegative1WisdomModifier()
+		{
+			var character = new Character
+			{
+				Race = CharacterRace.Orc,
+			};
+			var wisdomModifier = character.GetWisdomModifier();
+			Assert.AreEqual(-1, wisdomModifier);
+		}
+
+		[Test]
+		public void OrcRaceHasNegative1CharismaModifier()
+		{
+			var character = new Character
+			{
+				Race = CharacterRace.Orc,
+			};
+			var charismaModifier = character.GetCharismaModifier();
+			Assert.AreEqual(-1, charismaModifier);
+		}
+
+		[Test]
+		public void OrcRaceHasPlus2ArmorClass()
+		{
+			var character = new Character
+			{
+				Race = CharacterRace.Orc
+			};
+			Assert.AreEqual(12, character.ArmorClass);
+		}
+
+		[Test]
+		public void DwarfRaceHasPlus1Constitution()
+		{
+			var character = new Character
+			{
+				Race = CharacterRace.Dwarf
+			};
+			Assert.AreEqual(1, character.GetConstitutionModifier());
+		}
+
+		[Test]
+		public void DwarfRaceHasNegative1CharismaModifier()
+		{
+			var character = new Character
+			{
+				Race = CharacterRace.Dwarf,
+			};
+			var charismaModifier = character.GetCharismaModifier();
+			Assert.AreEqual(-1, charismaModifier);
+		}
+
+		[TestCase(0, 10, ExpectedResult = 7)]
+		[TestCase(1000, 10, ExpectedResult = 14)]
+		[TestCase(1000, 14, ExpectedResult = 22)]
+		[TestCase(4000, 10, ExpectedResult = 35)]
+		[TestCase(4000, 14, ExpectedResult = 55)]
+		[TestCase(4000, 8, ExpectedResult = 25)]
+		public int DwarfRaceHealthDoublePositiveConstitutionModifierForHitPoints(int experience, int constitution)
+		{
+			var character = new Character
+			{
+				Race = CharacterRace.Dwarf,
+				Experience = experience,
+				Constitution = constitution
+			};
+			return character.HitPoints;
+		}
+
+		[Test]
+		public void DwarfRaceHasPlus2AttackAgainstOrcs()
+		{
+			var character = new Character
+			{
+				Race = CharacterRace.Dwarf,
+			};
+			var opponent = new Character
+			{
+				Race = CharacterRace.Orc,
+			};
+			bool wasHit = character.Attack(opponent, 10);
+			Assert.IsTrue(wasHit);
+		}
+
+		[Test]
+		public void DwarfRaceHasNormalAttackAgainstNonOrcs()
+		{
+			var character = new Character
+			{
+				Race = CharacterRace.Dwarf,
+			};
+			var opponent = new Character
+			{
+				Race = CharacterRace.Human,
+			};
+			bool wasHit = character.Attack(opponent, 8);
+			Assert.IsFalse(wasHit);
+		}
+
+
+		[Test]
+		public void DwarfRaceHasPlus2DamageAgainstOrcs()
+		{
+			var character = new Character
+			{
+				Race = CharacterRace.Dwarf,
+			};
+			var opponent = new Character
+			{
+				Race = CharacterRace.Orc,
+			};
+			bool wasHit = character.Attack(opponent, 10);
+			Assert.AreEqual(2, opponent.HitPoints);
+		}
+
+		[Test]
+		public void DwarfRaceHasNormalDamageAgainstNonOrcs()
+		{
+			var character = new Character
+			{
+				Race = CharacterRace.Dwarf,
+			};
+			var opponent = new Character
+			{
+				Race = CharacterRace.Human,
+			};
+			bool wasHit = character.Attack(opponent, 10);
+			Assert.AreEqual(4, opponent.HitPoints);
+		}
+
+		[Test]
+		public void ElfRaceHasPlus1DexterityModifier()
+		{
+			var character = new Character
+			{
+				Race = CharacterRace.Elf,
+			};
+			var modifier = character.GetDexterityModifier();
+			Assert.AreEqual(1, modifier);
+		}
+
+		[Test]
+		public void ElfRaceHasNegative1ConstitutionModifier()
+		{
+			var character = new Character
+			{
+				Race = CharacterRace.Elf,
+			};
+			var modifier = character.GetConstitutionModifier();
+			Assert.AreEqual(-1, modifier);
+		}
+
+		[Test]
+		public void ElfOnlyRequires19ForCrit()
+		{
+			var character = new Character
+			{
+				Race = CharacterRace.Elf,
+			};
+
+			var opponent = new Character();
+			var wasHit = character.Attack(opponent, 19);
+			Assert.AreEqual(3, opponent.HitPoints);
+		}
 	}
 }

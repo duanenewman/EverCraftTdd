@@ -24,8 +24,8 @@ namespace EverCraftTdd
 			set => _alignment = Class.ValidateAlignment(value);
 		}
 		public int BaseArmorClass { get; set; } = 10;
-		public int ArmorClass { get => BaseArmorClass + GetModifier(Dexterity) + Class.GetArmorClassBonusModifier(this); }
-		public int MaxHitPoints { get => Level * Math.Max(Class.BaseHitPoints + GetModifier(Constitution), 1); }
+		public int ArmorClass { get => BaseArmorClass + GetDexterityModifier() + Class.GetArmorClassBonusModifier(this) + Race.GetArmorClassBonusModifier(this);  }
+		public int MaxHitPoints { get => Level * Math.Max(Class.BaseHitPoints + GetConstitutionModifier(), 1) + Race.GetBonusHitPoints(this); }
 		public int HitPoints
 		{
 			get => _hitPoints + MaxHitPoints;
@@ -36,12 +36,14 @@ namespace EverCraftTdd
 
 		public int Strength { get => _strength; set => _strength = SetAttribute(value); }
 		public int Dexterity { get => _dexterity; set => _dexterity = SetAttribute(value); }
+
 		public int Constitution { get => _constitution; set => _constitution = SetAttribute(value); }
 		public int Wisdom { get => _wisdom; set => _wisdom = SetAttribute(value); }
 		public int Intelligence { get => _intelligence; set => _intelligence = SetAttribute(value); }
 		public int Charisma { get => _charisma; set => _charisma = SetAttribute(value); }
 		public int Level { get => 1 + Experience / 1000; }
 		public CharacterClass Class { get; set; } = CharacterClass.Default;
+		public CharacterRace Race { get; set; } = CharacterRace.Human;
 
 		private int SetAttribute(int val)
 		{
@@ -52,17 +54,17 @@ namespace EverCraftTdd
 
 		public bool Attack(Character opponent, int attackRoll)
 		{
-			int attackModifier = GetModifier(Class.GetAttackAttribute(this));
+			int attackModifier = Class.GetAttackModifier(this);
 			var levelModifier = Class.GetLevelModifier(Level);
-			var attackBonus = Class.GetHitBonus(opponent);
+			var attackBonus = Class.GetHitBonus(opponent) + Race.GetHitBonus(opponent);
 			var toHit = attackRoll + levelModifier + attackModifier + attackBonus;
-			var dexACMod = Class.IgnoresDexterityArmorClassModifier ? Math.Max(GetModifier(opponent.Dexterity), 0) : 0;
+			var dexACMod = Class.IgnoresDexterityArmorClassModifier ? Math.Max(opponent.GetDexterityModifier(), 0) : 0;
 			var wasHit = toHit >= opponent.ArmorClass - dexACMod;
 			if (wasHit)
 			{
-				var damageBonus = Class.GetDamageBonus(opponent);
+				var damageBonus = Class.GetDamageBonus(opponent) + Race.GetDamageBonus(opponent);
 				var baseDamage = Class.BaseAttackDamage + attackModifier + damageBonus;
-				var wasCrit = attackRoll == 20;
+				var wasCrit = attackRoll == 20 - Race.CritRollReduction;
 				var damage = wasCrit ? baseDamage * Class.GetCritMultiplier(opponent) : baseDamage;
 				opponent.HitPoints -= Math.Max(damage, 1);
 				Experience += 10;
@@ -78,6 +80,43 @@ namespace EverCraftTdd
 				return (value - 11) / 2;
 			}
 			return (value - 10) / 2;
+		}
+
+		public int GetIntelligenceModifier()
+		{
+			var baseMod = GetModifier(Intelligence);
+
+			return baseMod + Race.IntelligenceModifierBonus;
+		}
+
+		public int GetStrengthModifier()
+		{
+			var baseMod = GetModifier(Strength);
+			return baseMod + Race.StrengthModifierBonus;
+		}
+
+		public int GetDexterityModifier()
+		{
+			var baseMod = GetModifier(Dexterity);
+			return baseMod + Race.DexterityModifierBonus;
+		}
+
+		public int GetWisdomModifier()
+		{
+			var baseMod = GetModifier(Wisdom);
+			return baseMod + Race.WisdomModifierBonus;
+		}
+
+		public int GetCharismaModifier()
+		{
+			var baseMod = GetModifier(Charisma);
+			return baseMod + Race.CharismaModifierBonus;
+		}
+
+		public int GetConstitutionModifier()
+		{
+			var baseMod = GetModifier(Constitution);
+			return baseMod + Race.ConstitutionModifierBonus;
 		}
 	}
 }
